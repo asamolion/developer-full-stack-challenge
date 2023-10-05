@@ -6,9 +6,12 @@ from .database import Base
 
 class Book(Base):
     __tablename__ = "books"
+
+    id = Column(Integer, primary_key=True)
     name = Column(String)
     page_numbers = Column(Integer)
-    author_name = Column(String, ForeignKey("authors.name"))
+
+    author_id = Column(Integer, ForeignKey("authors.id"))
 
     author = relationship("Author", back_populates="books")
 
@@ -16,6 +19,7 @@ class Book(Base):
 class Author(Base):
     __tablename__ = "authors"
 
-    name = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
 
     books = relationship("Book", back_populates="author")
