@@ -1,12 +1,13 @@
+"""
+All CRUD utilities are defined in this module
+"""
 from sqlalchemy.orm import Session
-from typing import Annotated
-from fastapi import Depends
 
 import models
 import schemas
 
 
-def get_user(db: Session, username: str):
+def get_user(db: Session, username: str) -> schemas.UserInDB:
     return db.query(models.User).filter(models.User.username == username).first()
 
 
