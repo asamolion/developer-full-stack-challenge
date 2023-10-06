@@ -26,10 +26,6 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
-def fake_hash_password(password: str):
-    return "fakehashed" + password
-
-
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -40,8 +36,11 @@ def get_db():
 
 
 @app.get("/me")
-async def read_users_me(current_user: Annotated[schemas.UserBase, Depends()], db: Session = Depends(get_db)):
-    return get_current_user(db, current_user)
+async def read_users_me(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Session = Depends(get_db),
+) -> schemas.UserOut:
+    return await get_current_user(db, token)
 
 
 @app.post("/token")
@@ -61,10 +60,16 @@ def read_root(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 @app.get("/authors")
-def get_authors():
+def render_authors_page():
+    """
+    Authors page
+    """
     return {"Authors": "Page"}
 
 
 @app.get("/books")
-def get_books():
+def render_books_page():
+    """
+    Books page
+    """
     return {"Books": "Page"}

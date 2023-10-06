@@ -21,15 +21,20 @@ class UserInDB(UserBase):
     password: str
 
 
+class UserOut(UserBase):
+    class Config:
+        orm_mode = True
+
+
 class AuthorBase(BaseModel):
     name: str
 
 
-class AuthorCreate(AuthorBase):
+class AuthorIn(AuthorBase):
     pass
 
 
-class AuthorReturn(AuthorBase):
+class AuthorOut(AuthorBase):
     id: int
 
 
@@ -41,6 +46,15 @@ class Author(AuthorBase):
 class BookBase(BaseModel):
     name: str
     page_numbers: int
+
+
+class BookIn(BookBase):
+    pass
+
+
+class BookOut(BookBase):
+    class Config:
+        orm_mode = True
 
 
 class BookCreate(BookBase):

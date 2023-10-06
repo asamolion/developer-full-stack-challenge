@@ -7,7 +7,7 @@ import models
 import schemas
 
 
-def get_user(db: Session, username: str) -> schemas.UserInDB:
+def get_user(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
 
 
@@ -36,7 +36,7 @@ def get_books(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Book).offset(skip).limit(limit).all()
 
 
-def create_author(db: Session, author: schemas.AuthorCreate):
+def create_author(db: Session, author: schemas.AuthorIn):
     db_author = models.Author(name=author.name)
 
     db.add(db_author)
