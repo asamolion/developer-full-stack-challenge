@@ -60,6 +60,9 @@ export default {
     },
 
     auth: {
+        redirect: {
+            home: '/',
+        },
         strategies: {
             local: {
                 scheme: 'local',
@@ -76,13 +79,16 @@ export default {
                     login: {
                         url: '/token',
                         method: 'post',
-                        headers: { 'content-type': 'application/x-www-form-urlencoded' },
                     },
                     logout: false,
                     user: false,
                 },
             },
         },
+    },
+
+    router: {
+        middleware: ['auth'],
     },
 
     // Build Configuration: https://go.nuxtjs.dev/config-build

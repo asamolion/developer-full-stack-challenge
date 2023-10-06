@@ -28,7 +28,8 @@
 
 <script>
 export default {
-    auth: false,
+    name: 'login',
+    auth: 'guest',
     data() {
         return {
             form: {
@@ -47,9 +48,14 @@ export default {
                 password: event.target.elements['input-password'].value,
             });
 
-            const response = await this.$auth.loginWith('local', {
-                data,
-            });
+            try {
+                const response = await this.$auth.loginWith('local', {
+                    data,
+                });
+                this.$router.push('/');
+            } catch (e) {
+                console.error(e);
+            }
         },
     },
 };
