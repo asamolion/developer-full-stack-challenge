@@ -44,6 +44,7 @@ export default {
         ['bootstrap-vue/nuxt', { icons: true, css: true }],
         // https://go.nuxtjs.dev/axios
         '@nuxtjs/axios',
+        '@nuxtjs/auth-next',
     ],
 
     publicRuntimeConfig: {
@@ -56,6 +57,32 @@ export default {
     axios: {
         // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
         baseURL: process.env.NODE_ENV == 'development' ? 'http://127.0.0.1:8000' : process.env.BASEURL,
+    },
+
+    auth: {
+        strategies: {
+            local: {
+                scheme: 'local',
+                token: {
+                    property: 'access_token',
+                    global: true,
+                    type: 'Bearer',
+                },
+                user: {
+                    property: 'user',
+                    // autoFetch: true
+                },
+                endpoints: {
+                    login: {
+                        url: '/token',
+                        method: 'post',
+                        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+                    },
+                    logout: false,
+                    user: false,
+                },
+            },
+        },
     },
 
     // Build Configuration: https://go.nuxtjs.dev/config-build
