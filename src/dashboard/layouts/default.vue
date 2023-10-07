@@ -10,7 +10,7 @@
                 <b-nav-item v-if="$auth.loggedIn" to="/authors" exact exact-active-class="active">Authors</b-nav-item>
             </b-nav>
         </b-navbar>
-        <Nuxt />
+        <Nuxt class="mt-3" />
     </div>
 </template>
 

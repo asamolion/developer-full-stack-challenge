@@ -18,6 +18,7 @@ from auth import (
     login_user,
 )
 
+import crud
 import models
 import schemas
 
@@ -73,11 +74,25 @@ def read_root(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 @app.get("/authors")
-def render_authors_page():
+def list_authors(
+    skip: int,
+    limit: int,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Session = Depends(get_db),
+):
     """
     Authors page
     """
-    return {"Authors": "Page"}
+    return crud.get_authors(db, skip=skip, limit=limit)
+
+
+@app.post("/authors")
+def add_author(
+    author: schemas.AuthorIn,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Session = Depends(get_db),
+):
+    return crud.create_author(db, author)
 
 
 @app.get("/books")

@@ -11,7 +11,7 @@ def get_user(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
 
 
-def create_book(db: Session, book: schemas.BookCreate):
+def create_book(db: Session, book: schemas.BookIn):
     db_book = models.Book(
         name=book.name,
         page_numbers=book.page_numbers,
@@ -43,6 +43,10 @@ def create_author(db: Session, author: schemas.AuthorIn):
     db.commit()
     db.refresh(db_author)
     return db_author
+
+
+def get_authors(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Author).offset(skip).limit(limit).all()
 
 
 def get_author(db: Session, author_id: int):

@@ -37,8 +37,6 @@ class AuthorIn(AuthorBase):
 class AuthorOut(AuthorBase):
     id: int
 
-
-class Author(AuthorBase):
     class Config:
         orm_mode = True
 
@@ -49,16 +47,12 @@ class BookBase(BaseModel):
 
 
 class BookIn(BookBase):
-    pass
+    author_id: int
 
-
-class BookOut(BookBase):
     class Config:
         orm_mode = True
 
 
-class BookCreate(BookBase):
-    author_id: int
-
+class BookOut(BookBase):
     class Config:
         orm_mode = True
