@@ -153,7 +153,7 @@ def list_books(
 
 @app.post("/books")
 def add_book(
-    book: schemas.BookIn,
+    book: schemas.BookCreate,
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Session = Depends(get_db),
 ):

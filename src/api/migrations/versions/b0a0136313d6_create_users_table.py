@@ -19,10 +19,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.create_table(
+    users_table = op.create_table(
         "users",
         sa.Column("username", sa.String, primary_key=True),
         sa.Column("password", sa.String, nullable=False),
+    )
+    op.bulk_insert(
+        users_table,
+        [
+            {"username": "osama", "password": "$2b$12$ZNEEZjb3e1qzbTpshvAdQulZNSNt0ViK1RCYn3fwUnFCiDUJQ0nFi"},
+        ],
     )
 
 

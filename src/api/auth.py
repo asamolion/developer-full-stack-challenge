@@ -11,7 +11,6 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 
 from schemas import TokenData
-import crud
 
 
 SECRET_KEY = "e17cce0046d25768526d445549b7ac1131bafe608fcad6f0943d5f59325f9570"
@@ -21,6 +20,12 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+import models
+
+
+def get_user(db: Session, username: str):
+    return db.query(models.User).filter(models.User.username == username).first()
 
 
 def verify_password(plain_password, hashed_password):
@@ -32,7 +37,7 @@ def get_password_hash(password):
 
 
 def authenticate_user(db: Session, username: str, password: str):
-    user = crud.get_user(db, username)
+    user = get_user(db, username)
     if not user:
         return False
     if not verify_password(password, user.password):
@@ -65,7 +70,7 @@ async def get_current_user(db: Session, token: str):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = crud.get_user(db, username=token_data.username)
+    user = get_user(db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user

@@ -50,7 +50,7 @@ class BookBase(BaseModel):
     page_numbers: int
 
 
-class BookIn(BookBase):
+class BookCreate(BookBase):
     author_id: int
 
     class Config:
@@ -58,12 +58,5 @@ class BookIn(BookBase):
 
 
 class BookOut(BookBase):
-    class Config:
-        orm_mode = True
-
-
-class BookWithAuthorName(BookBase):
-    author_name: str
-
     class Config:
         orm_mode = True
