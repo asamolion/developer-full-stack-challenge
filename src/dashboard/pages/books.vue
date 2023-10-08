@@ -1,5 +1,6 @@
 <template>
     <b-container fluid="lg">
+        <h1>Books</h1>
         <b-form-row>
             <b-col col lg="10">
                 <b-form-input id="input-search" class="mb-2 mr-sm-2 mb-sm-0" placeholder="Search..."> </b-form-input>
@@ -10,16 +11,14 @@
             </b-col>
         </b-form-row>
 
-        <b-row>
-            <b-row class="mt-3">
-                <b-table :items="books" per-page="limit"></b-table>
-                <b-pagination-nav
-                    v-model="page"
-                    base-url="/books?page="
-                    :number-of-pages="10"
-                    use-router
-                ></b-pagination-nav>
-            </b-row>
+        <b-row class="mt-3">
+            <b-table :items="books" per-page="limit" :fields="['name', 'page_numbers', 'author_name']"></b-table>
+            <b-pagination-nav
+                v-model="page"
+                base-url="/books?page="
+                :number-of-pages="10"
+                use-router
+            ></b-pagination-nav>
         </b-row>
 
         <b-modal id="modal-book" title="Add Book" @ok="handleOk">

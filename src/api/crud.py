@@ -33,7 +33,6 @@ def get_books_by_author(db: Session, author_id: int):
 
 
 def get_books(db: Session, skip: int = 0, limit: int = 100):
-    print(db.query(models.Book).offset(skip).limit(limit).all())
     return db.query(models.Book).offset(skip).limit(limit).all()
 
 
