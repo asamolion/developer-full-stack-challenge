@@ -18,7 +18,7 @@
         </b-form-row>
 
         <b-row class="mt-3">
-            <b-table :items="books" per-page="limit" :fields="['name', 'page_numbers', 'author_name']"></b-table>
+            <b-table :items="books" :per-page="10" :fields="['name', 'page_numbers', 'author_name']"></b-table>
             <b-pagination-nav
                 v-model="page"
                 base-url="/books?page="
@@ -114,7 +114,7 @@ export default {
         },
         async getBooks() {
             this.books = await this.$axios.$get('/books', {
-                params: { skip: this.page * 10 - 10, limit: 10, search: this.searchQuery },
+                params: { skip: this.page * 10 - 10, search: this.searchQuery },
             });
         },
         async addBook() {
@@ -141,10 +141,9 @@ export default {
             return { id: author.id, label: author.name };
         },
         loadAuthors: async function ({ action, searchQuery, callback }) {
-            console.log({ searchQuery });
             if (action === ASYNC_SEARCH) {
                 this.authors = await this.$axios.$get('/authors', {
-                    params: { skip: this.page * 10 - 10, limit: 10 },
+                    params: { skip: this.page * 10 - 10, search: searchQuery },
                 });
 
                 callback(null, this.authors);

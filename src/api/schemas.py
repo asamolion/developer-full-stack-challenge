@@ -30,7 +30,11 @@ class AuthorBase(BaseModel):
     name: str
 
 
-class AuthorIn(AuthorBase):
+class AuthorCreate(AuthorBase):
+    pass
+
+
+class AuthorPatch(AuthorBase):
     pass
 
 

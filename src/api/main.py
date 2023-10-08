@@ -20,7 +20,6 @@ from auth import (
     login_user,
 )
 
-import crud
 import models
 import schemas
 
@@ -77,10 +76,10 @@ def read_root(token: Annotated[str, Depends(oauth2_scheme)]):
 
 @app.get("/authors")
 def list_authors(
-    skip: int,
-    limit: int,
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Session = Depends(get_db),
+    skip: int | None = 0,
+    limit: int = 10,
     search: str | None = "",
 ):
     """
@@ -102,34 +101,54 @@ def list_authors(
 
 @app.post("/authors")
 def add_author(
-    author: schemas.AuthorIn,
+    author: schemas.AuthorCreate,
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Session = Depends(get_db),
 ):
-    return crud.create_author(db, author)
+    db_author = models.Author(name=author.name)
+
+    db.add(db_author)
+    db.commit()
+    db.refresh(db_author)
+    return db_author
+
+
+@app.patch("/authors/{author_id}")
+def edit_author(
+    author_id: int,
+    author: schemas.AuthorPatch,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Session = Depends(get_db),
+) -> schemas.AuthorOut:
+    db_author = db.query(models.Author).get(author_id)
+    db_author.name = author.name
+    db.commit()
+    return db_author
 
 
 @app.get("/books")
 def list_books(
-    skip: int,
-    limit: int,
-    search: str,
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Session = Depends(get_db),
+    author_id: int | None = None,
+    search: str | None = None,
+    skip: int | None = 0,
+    limit: int = 10,
 ):
     """
     Books page
     """
-    result = (
-        db.query(models.Book.id, models.Book.name, models.Book.page_numbers, models.Author.name.label("author_name"))
-        .join(models.Author)
-        .filter(models.Book.name.ilike("%{}%".format(search)))
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
+    result = db.query(
+        models.Book.id, models.Book.name, models.Book.page_numbers, models.Author.name.label("author_name")
+    ).join(models.Author)
 
-    return result
+    if search:
+        result = result.filter(models.Book.name.ilike("%{}%".format(search)))
+
+    if author_id:
+        result = result.where(models.Book.author_id == author_id)
+
+    return result.offset(skip).limit(limit).all()
 
 
 @app.post("/books")
@@ -138,4 +157,23 @@ def add_book(
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Session = Depends(get_db),
 ):
-    return crud.create_book(db, book=book)
+    db_book = models.Book(
+        name=book.name,
+        page_numbers=book.page_numbers,
+        author_id=book.author_id,
+    )
+
+    db.add(db_book)
+    db.commit()
+    db.refresh(db_book)
+    return db_book
+
+
+@app.delete("/books/{book_id}")
+def delete_book(
+    book_id: int,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Session = Depends(get_db),
+):
+    db.query(models.Book).filter(models.Book.id == book_id).delete()
+    db.commit()
