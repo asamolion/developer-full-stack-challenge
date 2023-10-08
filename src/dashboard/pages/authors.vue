@@ -3,7 +3,12 @@
         <h1>Authors</h1>
         <b-form-row>
             <b-col col lg="10">
-                <b-form-input id="input-search" class="mb-2 mr-sm-2 mb-sm-0" placeholder="Search..."></b-form-input>
+                <b-form-input
+                    id="input-search"
+                    class="mb-2 mr-sm-2 mb-sm-0"
+                    placeholder="Search..."
+                    v-model="searchQuery"
+                ></b-form-input>
             </b-col>
 
             <b-col cols="12" xs="auto" lg="2">
@@ -12,7 +17,7 @@
         </b-form-row>
 
         <b-row class="mt-3">
-            <b-table :items="authors" per-page="limit"></b-table>
+            <b-table :items="authors" per-page="limit" :fields="['name', 'book_count']"></b-table>
             <b-pagination-nav
                 v-model="page"
                 base-url="/authors?page="
@@ -42,6 +47,7 @@ export default {
     name: 'authors',
     data() {
         return {
+            searchQuery: this.$route.query.searchQuery ? this.$route.query.searchQuery : '',
             page: this.$route.query.page ? this.$route.query.page : 1,
             authors: [],
             modal: {
@@ -50,11 +56,13 @@ export default {
         };
     },
     async fetch() {
-        this.authors = await this.$axios.$get('/authors', {
-            params: { skip: this.page * 10 - 10, limit: 10 },
-        });
+        this.getAuthors();
     },
     watch: {
+        searchQuery: function () {
+            // this could use a debounce
+            this.getAuthors();
+        },
         page: function () {
             this.$nuxt.refresh();
         },
@@ -66,7 +74,9 @@ export default {
             this.addAuthor();
         },
         async getAuthors() {
-            return await this.$axios.$get('/authors', { params: { skip: this.skip, limit: this.limit } });
+            this.authors = await this.$axios.$get('/authors', {
+                params: { skip: this.page * 10 - 10, limit: 10, search: this.searchQuery },
+            });
         },
         async addAuthor() {
             if (this.modal.name === '') {

@@ -2,6 +2,7 @@
 All CRUD utilities are defined in this module
 """
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.sql import func
 
 import models
 import schemas
@@ -33,10 +34,6 @@ def get_books_by_author(db: Session, author_id: int):
 
 
 def get_books(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Book).offset(skip).limit(limit).all()
-
-
-def get_books_with_author_name(db: Session, skip: int = 0, limit: int = 100):
     result = (
         db.query(models.Book.id, models.Book.name, models.Book.page_numbers, models.Author.name.label("author_name"))
         .join(models.Author)
@@ -58,7 +55,17 @@ def create_author(db: Session, author: schemas.AuthorIn):
 
 
 def get_authors(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Author).offset(skip).limit(limit).all()
+    result = (
+        db.query(models.Author.id, models.Author.name, func.count(models.Book.id).label("book_count"))
+        .join(models.Book, isouter=True)
+        .group_by(models.Author.id)
+        .order_by(models.Author.id.asc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+    return result
 
 
 def get_author(db: Session, author_id: int):

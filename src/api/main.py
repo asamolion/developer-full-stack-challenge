@@ -10,6 +10,8 @@ from fastapi import (
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
+from sqlalchemy.sql.operators import ilike_op
 
 from database import SessionLocal, engine
 from auth import (
@@ -79,11 +81,23 @@ def list_authors(
     limit: int,
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Session = Depends(get_db),
+    search: str | None = "",
 ):
     """
     Authors page
     """
-    return crud.get_authors(db, skip=skip, limit=limit)
+    result = (
+        db.query(models.Author.id, models.Author.name, func.count(models.Book.id).label("book_count"))
+        .join(models.Book, isouter=True)
+        .group_by(models.Author.id)
+        .order_by(models.Author.id.asc())
+        .filter(models.Author.name.ilike("%{}%".format(search)))
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+    return result
 
 
 @app.post("/authors")
@@ -99,13 +113,23 @@ def add_author(
 def list_books(
     skip: int,
     limit: int,
+    search: str,
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Session = Depends(get_db),
 ):
     """
     Books page
     """
-    return crud.get_books_with_author_name(db, skip=skip, limit=limit)
+    result = (
+        db.query(models.Book.id, models.Book.name, models.Book.page_numbers, models.Author.name.label("author_name"))
+        .join(models.Author)
+        .filter(models.Book.name.ilike("%{}%".format(search)))
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+    return result
 
 
 @app.post("/books")

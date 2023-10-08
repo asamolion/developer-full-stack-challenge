@@ -3,7 +3,13 @@
         <h1>Books</h1>
         <b-form-row>
             <b-col col lg="10">
-                <b-form-input id="input-search" class="mb-2 mr-sm-2 mb-sm-0" placeholder="Search..."> </b-form-input>
+                <b-form-input
+                    id="input-search"
+                    class="mb-2 mr-sm-2 mb-sm-0"
+                    placeholder="Search..."
+                    v-model="searchQuery"
+                >
+                </b-form-input>
             </b-col>
 
             <b-col cols="12" xs="auto" lg="2">
@@ -59,7 +65,6 @@
                         placeholder="Select your author..."
                         v-model="modal.author"
                     />
-                    <!-- <treeselect-value :value="modal.author" /> -->
                 </b-form-group>
             </b-form>
         </b-modal>
@@ -78,6 +83,7 @@ export default {
     data() {
         return {
             page: this.$route.query.page ? this.$route.query.page : 1,
+            searchQuery: this.$route.query.searchQuery ? this.$route.query.searchQuery : '',
             authors: [],
             books: [],
             modal: {
@@ -88,20 +94,28 @@ export default {
         };
     },
     async fetch() {
-        this.books = await this.$axios.$get('/books', {
-            params: { skip: this.page * 10 - 10, limit: 10 },
-        });
+        await this.getBooks();
     },
     watch: {
+        searchQuery: function (newVal, oldVal) {
+            // this could use a debounce
+            this.getBooks();
+        },
         page: function () {
             this.$nuxt.refresh();
         },
     },
+
     methods: {
         handleOk(evt) {
             // Prevent modal from closing
             evt.preventDefault();
             this.addBook();
+        },
+        async getBooks() {
+            this.books = await this.$axios.$get('/books', {
+                params: { skip: this.page * 10 - 10, limit: 10, search: this.searchQuery },
+            });
         },
         async addBook() {
             if (this.modal.name === '') {
@@ -129,7 +143,6 @@ export default {
         loadAuthors: async function ({ action, searchQuery, callback }) {
             console.log({ searchQuery });
             if (action === ASYNC_SEARCH) {
-                console.log('searchQuery: ', searchQuery);
                 this.authors = await this.$axios.$get('/authors', {
                     params: { skip: this.page * 10 - 10, limit: 10 },
                 });
