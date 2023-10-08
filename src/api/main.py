@@ -96,8 +96,22 @@ def add_author(
 
 
 @app.get("/books")
-def render_books_page():
+def list_books(
+    skip: int,
+    limit: int,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Session = Depends(get_db),
+):
     """
     Books page
     """
-    return {"Books": "Page"}
+    return crud.get_books_with_author_name(db, skip=skip, limit=limit)
+
+
+@app.post("/books")
+def add_book(
+    book: schemas.BookIn,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Session = Depends(get_db),
+):
+    return crud.create_book(db, book=book)

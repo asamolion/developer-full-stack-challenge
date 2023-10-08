@@ -1,7 +1,7 @@
 """
 All CRUD utilities are defined in this module
 """
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 import models
 import schemas
@@ -33,7 +33,20 @@ def get_books_by_author(db: Session, author_id: int):
 
 
 def get_books(db: Session, skip: int = 0, limit: int = 100):
+    print(db.query(models.Book).offset(skip).limit(limit).all())
     return db.query(models.Book).offset(skip).limit(limit).all()
+
+
+def get_books_with_author_name(db: Session, skip: int = 0, limit: int = 100):
+    result = (
+        db.query(models.Book.id, models.Book.name, models.Book.page_numbers, models.Author.name.label("author_name"))
+        .join(models.Author)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+    return result
 
 
 def create_author(db: Session, author: schemas.AuthorIn):

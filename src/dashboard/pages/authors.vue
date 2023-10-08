@@ -15,8 +15,7 @@
             <b-table :items="authors" per-page="limit"></b-table>
             <b-pagination-nav
                 v-model="page"
-                :link-gen="linkGen"
-                :per-page="10"
+                base-url="/authors?page="
                 :number-of-pages="10"
                 use-router
             ></b-pagination-nav>
@@ -55,6 +54,11 @@ export default {
             params: { skip: this.page * 10 - 10, limit: 10 },
         });
     },
+    watch: {
+        page: function () {
+            this.$nuxt.refresh();
+        },
+    },
     methods: {
         handleOk(evt) {
             // Prevent modal from closing
@@ -69,7 +73,7 @@ export default {
                 alert('Please enter author name.');
                 return;
             }
-            const author = await this.$axios.$post('/authors', {
+            await this.$axios.$post('/authors', {
                 name: this.modal.name,
             });
             this.$nuxt.refresh();

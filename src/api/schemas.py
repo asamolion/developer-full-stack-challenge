@@ -56,3 +56,10 @@ class BookIn(BookBase):
 class BookOut(BookBase):
     class Config:
         orm_mode = True
+
+
+class BookWithAuthorName(BookBase):
+    author_name: str
+
+    class Config:
+        orm_mode = True
