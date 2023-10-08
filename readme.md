@@ -1,3 +1,26 @@
+# My Solution
+
+I have used the following Postgres connection string
+
+```
+postgresql://datacose:datacose@localhost:5432/datacose
+```
+As such, you will have to create a user `datacose` with the password `datacose` and give it access to a DB named `datacose` to get thr project running.
+
+I have used alembic to manage migrations. The migrations themselves contain the necessary table set up and seeding of data.
+
+There is only one user
+
+username: osama
+password: Lahore22
+
+I have already pre-populated the database (and the login form) with the user credentials.
+
+I have used the `@nuxtjs/auth-next` to manage authentication. BootstrapVue, Vuetreeselect, Pydantic and SQLAlchemy have been used as instructed.
+
+I have tried to implement as many features as possible. I might have missed a few minor things, however, I do feel that the code is sufficient to show my prowess.
+
+
 # DataCose Full Stack Challenge
 
 The goal of this challenge if to create a Nuxt frontend with a FastAPI backend matching the objectives down below.
